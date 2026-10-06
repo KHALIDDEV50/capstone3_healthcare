@@ -1,6 +1,7 @@
 
 package com.example.capstone3.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,15 +20,19 @@ public class HealthAssessment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     // User ID
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
 
     // Previous Assessment ID
-    @Column(name = "previous_assessment_id")
-    private Long previousAssessmentId;
+    @ManyToOne
+    @JoinColumn(name = "previous_assessment_id")
+    @JsonIgnore
+    private HealthAssessment previousAssessment;
 
     // Attachments JSON
     @Column(columnDefinition = "json")
@@ -46,6 +51,7 @@ public class HealthAssessment {
     private String extractedValues;
 
     // AI Conclusion
+    // change to Sammy
     @Column(name = "ai_conclusion", columnDefinition = "text")
     private String aiConclusion;
 

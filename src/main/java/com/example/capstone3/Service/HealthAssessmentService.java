@@ -1,12 +1,12 @@
-
 package com.example.capstone3.Service;
 
 import com.example.capstone3.API.ApiException;
-import com.example.capstone3.DTO.HealthAssessmentRequestDTO;
+import com.example.capstone3.DTO.HealthAssessmentDTO;
 import com.example.capstone3.Model.HealthAssessment;
+import com.example.capstone3.Model.User;
 import com.example.capstone3.Repository.HealthAssessmentRepository;
+import com.example.capstone3.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 public class HealthAssessmentService {
 
     private final HealthAssessmentRepository healthAssessmentRepository;
+    private final UserRepository userRepository;
 
     // Get all Health Assessments
     public List<HealthAssessment> getAllHealthAssessments() {
@@ -24,7 +25,7 @@ public class HealthAssessmentService {
     }
 
     // Get Health Assessment By ID
-    public HealthAssessment getHealthAssessmentById(Long id) {
+    public HealthAssessment getHealthAssessmentById(Integer id) {
 
         HealthAssessment healthAssessment = healthAssessmentRepository.findById(id).orElse(null);
 
@@ -36,90 +37,139 @@ public class HealthAssessmentService {
     }
 
     // Get Health Assessments By User ID
-    public List<HealthAssessment> getHealthAssessmentsByUserId(Long userId) {
+    public List<HealthAssessment> getHealthAssessmentsByUserId(Integer userId) {
 
-        return healthAssessmentRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return healthAssessmentRepository.findByUser_Id(userId);
     }
 
     // Get Current Health Assessment By User ID
-    public List<HealthAssessment> getCurrentHealthAssessmentsByUserId(Long userId) {
+    public List<HealthAssessment> getCurrentHealthAssessmentsByUserId(Integer userId) {
 
-        return healthAssessmentRepository.findByUserIdAndIsCurrentTrue(userId);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return healthAssessmentRepository.findByUser_IdAndIsCurrentTrue(userId);
     }
 
     // Add Health Assessment
     public void addHealthAssessment(
-            HealthAssessmentRequestDTO healthAssessmentRequestDTO) {
+            HealthAssessmentDTO healthAssessmentDTO) {
 
+        // Find User
+        User user = userRepository.findById(healthAssessmentDTO.getUserId()).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        // Create Health Assessment
         HealthAssessment healthAssessment = new HealthAssessment();
 
-        healthAssessment.setUserId(healthAssessmentRequestDTO.getUserId());
+        // Set User
+        healthAssessment.setUser(user);
 
-        healthAssessment.setPreviousAssessmentId(healthAssessmentRequestDTO.getPreviousAssessmentId());
+        // Set Previous Assessment
+        if (healthAssessmentDTO.getPreviousAssessmentId() != null) {
 
-        healthAssessment.setAttachments(healthAssessmentRequestDTO.getAttachments());
+            HealthAssessment previousAssessment = healthAssessmentRepository.findById(healthAssessmentDTO.getPreviousAssessmentId()).orElse(null);
 
-        healthAssessment.setUserNotes(healthAssessmentRequestDTO.getUserNotes());
+            if (previousAssessment == null) {
+                throw new ApiException("Previous Health Assessment not found");
+            }
 
-        healthAssessment.setProfileSnapshot(healthAssessmentRequestDTO.getProfileSnapshot());
+            healthAssessment.setPreviousAssessment(previousAssessment);
+        }
 
-        healthAssessment.setExtractedValues(healthAssessmentRequestDTO.getExtractedValues());
+        healthAssessment.setAttachments(healthAssessmentDTO.getAttachments());
 
-        healthAssessment.setAiConclusion(healthAssessmentRequestDTO.getAiConclusion());
+        healthAssessment.setUserNotes(healthAssessmentDTO.getUserNotes());
 
-        healthAssessment.setTrend(healthAssessmentRequestDTO.getTrend());
+        healthAssessment.setProfileSnapshot(healthAssessmentDTO.getProfileSnapshot());
 
-        healthAssessment.setIsCurrent(healthAssessmentRequestDTO.getIsCurrent());
+        healthAssessment.setExtractedValues(healthAssessmentDTO.getExtractedValues());
 
-        healthAssessment.setAssessmentDate(healthAssessmentRequestDTO.getAssessmentDate());
+        healthAssessment.setAiConclusion(healthAssessmentDTO.getAiConclusion());
 
-        healthAssessment.setNextDueDate(healthAssessmentRequestDTO.getNextDueDate());
+        healthAssessment.setTrend(healthAssessmentDTO.getTrend());
+
+        healthAssessment.setIsCurrent(healthAssessmentDTO.getIsCurrent());
+
+        healthAssessment.setAssessmentDate(healthAssessmentDTO.getAssessmentDate());
+
+        healthAssessment.setNextDueDate(healthAssessmentDTO.getNextDueDate());
 
         healthAssessmentRepository.save(healthAssessment);
     }
 
     // Update Health Assessment
-    public void updateHealthAssessment(
-            Long id,
-            HealthAssessmentRequestDTO healthAssessmentRequestDTO) {
+    public void updateHealthAssessment(Integer id, HealthAssessmentDTO healthAssessmentDTO) {
 
-        HealthAssessment oldHealthAssessment =
-                healthAssessmentRepository.findById(id).orElse(null);
+        HealthAssessment oldHealthAssessment = healthAssessmentRepository.findById(id).orElse(null);
 
         if (oldHealthAssessment == null) {
             throw new ApiException("Health Assessment not found");
         }
 
-        oldHealthAssessment.setUserId(healthAssessmentRequestDTO.getUserId());
+        // Find User
+        User user = userRepository.findById(healthAssessmentDTO.getUserId()).orElse(null);
 
-        oldHealthAssessment.setPreviousAssessmentId(healthAssessmentRequestDTO.getPreviousAssessmentId());
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
 
-        oldHealthAssessment.setAttachments(healthAssessmentRequestDTO.getAttachments());
+        // Set User
+        oldHealthAssessment.setUser(user);
 
-        oldHealthAssessment.setUserNotes(healthAssessmentRequestDTO.getUserNotes());
+        // Set Previous Assessment
+        if (healthAssessmentDTO.getPreviousAssessmentId() != null) {
 
-        oldHealthAssessment.setProfileSnapshot(healthAssessmentRequestDTO.getProfileSnapshot());
+            HealthAssessment previousAssessment = healthAssessmentRepository.findById(healthAssessmentDTO.getPreviousAssessmentId()).orElse(null);
 
-        oldHealthAssessment.setExtractedValues(healthAssessmentRequestDTO.getExtractedValues());
+            if (previousAssessment == null) {
+                throw new ApiException("Previous Health Assessment not found");
+            }
 
-        oldHealthAssessment.setAiConclusion(healthAssessmentRequestDTO.getAiConclusion());
+            oldHealthAssessment.setPreviousAssessment(previousAssessment);
 
-        oldHealthAssessment.setTrend(healthAssessmentRequestDTO.getTrend());
+        } else {
 
-        oldHealthAssessment.setIsCurrent(healthAssessmentRequestDTO.getIsCurrent());
+            oldHealthAssessment.setPreviousAssessment(null);
+        }
 
-        oldHealthAssessment.setAssessmentDate(healthAssessmentRequestDTO.getAssessmentDate());
+        oldHealthAssessment.setAttachments(healthAssessmentDTO.getAttachments());
 
-        oldHealthAssessment.setNextDueDate(healthAssessmentRequestDTO.getNextDueDate());
+        oldHealthAssessment.setUserNotes(healthAssessmentDTO.getUserNotes());
+
+        oldHealthAssessment.setProfileSnapshot(healthAssessmentDTO.getProfileSnapshot());
+
+        oldHealthAssessment.setExtractedValues(healthAssessmentDTO.getExtractedValues());
+
+        oldHealthAssessment.setAiConclusion(healthAssessmentDTO.getAiConclusion());
+
+        oldHealthAssessment.setTrend(healthAssessmentDTO.getTrend());
+
+        oldHealthAssessment.setIsCurrent(healthAssessmentDTO.getIsCurrent());
+
+        oldHealthAssessment.setAssessmentDate(healthAssessmentDTO.getAssessmentDate());
+
+        oldHealthAssessment.setNextDueDate(healthAssessmentDTO.getNextDueDate());
 
         healthAssessmentRepository.save(oldHealthAssessment);
     }
 
     // Delete Health Assessment
-    public void deleteHealthAssessment(Long id) {
+    public void deleteHealthAssessment(Integer id) {
 
-        HealthAssessment healthAssessment =
-                healthAssessmentRepository.findById(id).orElse(null);
+        HealthAssessment healthAssessment = healthAssessmentRepository.findById(id).orElse(null);
 
         if (healthAssessment == null) {
             throw new ApiException("Health Assessment not found");

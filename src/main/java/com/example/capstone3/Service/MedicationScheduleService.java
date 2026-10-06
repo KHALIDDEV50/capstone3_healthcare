@@ -1,10 +1,11 @@
-
 package com.example.capstone3.Service;
 
 import com.example.capstone3.API.ApiException;
-import com.example.capstone3.DTO.MedicationScheduleRequestDTO;
+import com.example.capstone3.DTO.MedicationScheduleDTO;
 import com.example.capstone3.Model.MedicationSchedule;
+import com.example.capstone3.Model.User;
 import com.example.capstone3.Repository.MedicationScheduleRepository;
+import com.example.capstone3.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class MedicationScheduleService {
 
     private final MedicationScheduleRepository medicationScheduleRepository;
+    private final UserRepository userRepository;
 
     // Get all Medication Schedule
     public List<MedicationSchedule> getAllMedicationSchedule() {
@@ -23,7 +25,7 @@ public class MedicationScheduleService {
     }
 
     // Get Medication Schedule By ID
-    public MedicationSchedule getMedicationScheduleById(Long id) {
+    public MedicationSchedule getMedicationScheduleById(Integer id) {
 
         MedicationSchedule medicationSchedule = medicationScheduleRepository.findById(id).orElse(null);
 
@@ -35,46 +37,66 @@ public class MedicationScheduleService {
     }
 
     // Get Medication Schedule By User ID
-    public List<MedicationSchedule> getMedicationScheduleByUserId(Long userId) {
+    public List<MedicationSchedule> getMedicationScheduleByUserId(Integer userId) {
 
-        return medicationScheduleRepository.findByUserId(userId);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return medicationScheduleRepository.findByUser_Id(userId);
     }
 
     // Get Active Medication Schedule By User ID
-    public List<MedicationSchedule> getActiveMedicationScheduleByUserId(Long userId) {
+    public List<MedicationSchedule>
+    getActiveMedicationScheduleByUserId(Integer userId) {
 
-        return medicationScheduleRepository.findByUserIdAndIsActiveTrue(userId);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return medicationScheduleRepository.findByUser_IdAndIsActiveTrue(userId);
     }
 
     // Add Medication Schedule
-    public void addMedicationSchedule(
-            MedicationScheduleRequestDTO medicationScheduleRequestDTO) {
+    public void addMedicationSchedule(MedicationScheduleDTO medicationScheduleDTO) {
 
+        // Find User
+        User user = userRepository.findById(medicationScheduleDTO.getUserId()).orElse(null);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        // Create Medication Schedule
         MedicationSchedule medicationSchedule = new MedicationSchedule();
 
-        medicationSchedule.setUserId(medicationScheduleRequestDTO.getUserId());
+        // Set User
+        medicationSchedule.setUser(user);
 
-        medicationSchedule.setMedicationName(medicationScheduleRequestDTO.getMedicationName());
+        medicationSchedule.setMedicationName(medicationScheduleDTO.getMedicationName());
 
-        medicationSchedule.setDosage(medicationScheduleRequestDTO.getDosage());
+        medicationSchedule.setDosage(medicationScheduleDTO.getDosage()
+        );
 
-        medicationSchedule.setMealRelation(medicationScheduleRequestDTO.getMealRelation());
+        medicationSchedule.setMealRelation(medicationScheduleDTO.getMealRelation());
 
-        medicationSchedule.setTimes(medicationScheduleRequestDTO.getTimes());
+        medicationSchedule.setTimes(medicationScheduleDTO.getTimes());
 
-        medicationSchedule.setStartDate(medicationScheduleRequestDTO.getStartDate());
+        medicationSchedule.setStartDate(medicationScheduleDTO.getStartDate());
 
-        medicationSchedule.setEndDate(medicationScheduleRequestDTO.getEndDate());
+        medicationSchedule.setEndDate(medicationScheduleDTO.getEndDate());
 
-        medicationSchedule.setIsActive(medicationScheduleRequestDTO.getIsActive());
+        medicationSchedule.setIsActive(medicationScheduleDTO.getIsActive());
 
         medicationScheduleRepository.save(medicationSchedule);
     }
 
     // Update Medication Schedule
-    public void updateMedicationSchedule(
-            Long id,
-            MedicationScheduleRequestDTO medicationScheduleRequestDTO) {
+    public void updateMedicationSchedule(Integer id, MedicationScheduleDTO medicationScheduleDTO) {
 
         MedicationSchedule oldMedicationSchedule = medicationScheduleRepository.findById(id).orElse(null);
 
@@ -82,27 +104,35 @@ public class MedicationScheduleService {
             throw new ApiException("Medication Schedule not found");
         }
 
-        oldMedicationSchedule.setUserId(medicationScheduleRequestDTO.getUserId());
+        // Find User
+        User user = userRepository.findById(medicationScheduleDTO.getUserId()).orElse(null);
 
-        oldMedicationSchedule.setMedicationName(medicationScheduleRequestDTO.getMedicationName());
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
 
-        oldMedicationSchedule.setDosage(medicationScheduleRequestDTO.getDosage());
+        // Set User
+        oldMedicationSchedule.setUser(user);
 
-        oldMedicationSchedule.setMealRelation(medicationScheduleRequestDTO.getMealRelation());
+        oldMedicationSchedule.setMedicationName(medicationScheduleDTO.getMedicationName());
 
-        oldMedicationSchedule.setTimes(medicationScheduleRequestDTO.getTimes());
+        oldMedicationSchedule.setDosage(medicationScheduleDTO.getDosage());
 
-        oldMedicationSchedule.setStartDate(medicationScheduleRequestDTO.getStartDate());
+        oldMedicationSchedule.setMealRelation(medicationScheduleDTO.getMealRelation());
 
-        oldMedicationSchedule.setEndDate(medicationScheduleRequestDTO.getEndDate());
+        oldMedicationSchedule.setTimes(medicationScheduleDTO.getTimes());
 
-        oldMedicationSchedule.setIsActive(medicationScheduleRequestDTO.getIsActive());
+        oldMedicationSchedule.setStartDate(medicationScheduleDTO.getStartDate());
+
+        oldMedicationSchedule.setEndDate(medicationScheduleDTO.getEndDate());
+
+        oldMedicationSchedule.setIsActive(medicationScheduleDTO.getIsActive());
 
         medicationScheduleRepository.save(oldMedicationSchedule);
     }
 
     // Delete Medication Schedule
-    public void deleteMedicationSchedule(Long id) {
+    public void deleteMedicationSchedule(Integer id) {
 
         MedicationSchedule medicationSchedule = medicationScheduleRepository.findById(id).orElse(null);
 

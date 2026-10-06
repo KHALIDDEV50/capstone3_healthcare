@@ -2,7 +2,7 @@
 package com.example.capstone3.Controller;
 
 import com.example.capstone3.API.ApiResponse;
-import com.example.capstone3.DTO.HealthAssessmentRequestDTO;
+import com.example.capstone3.DTO.HealthAssessmentDTO;
 import com.example.capstone3.Model.HealthAssessment;
 import com.example.capstone3.Service.HealthAssessmentService;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ public class HealthAssessmentController {
 
     // Get Health Assessment By ID
     @GetMapping("/get/{id}")
-    public ResponseEntity<?> getHealthAssessmentById(@PathVariable Long id) {
+    public ResponseEntity<?> getHealthAssessmentById(@PathVariable Integer id) {
 
         HealthAssessment healthAssessment = healthAssessmentService.getHealthAssessmentById(id);
 
@@ -39,7 +39,7 @@ public class HealthAssessmentController {
 
     // Get Health Assessments By User ID
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getHealthAssessmentsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getHealthAssessmentsByUserId(@PathVariable Integer userId) {
 
         List<HealthAssessment> healthAssessments = healthAssessmentService.getHealthAssessmentsByUserId(userId);
 
@@ -48,7 +48,7 @@ public class HealthAssessmentController {
 
     // Get Current Health Assessment By User ID
     @GetMapping("/user/{userId}/current")
-    public ResponseEntity<?> getCurrentHealthAssessmentsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getCurrentHealthAssessmentsByUserId(@PathVariable Integer userId) {
 
         List<HealthAssessment> healthAssessments = healthAssessmentService.getCurrentHealthAssessmentsByUserId(userId);
 
@@ -57,25 +57,28 @@ public class HealthAssessmentController {
 
     // Add Health Assessment
     @PostMapping("/add")
-    public ResponseEntity<?> addHealthAssessment(@RequestBody @Valid HealthAssessmentRequestDTO healthAssessmentRequestDTO) {
+    public ResponseEntity<?> addHealthAssessment(
+            @RequestBody @Valid HealthAssessmentDTO healthAssessmentDTO) {
 
-        healthAssessmentService.addHealthAssessment(healthAssessmentRequestDTO);
+        healthAssessmentService.addHealthAssessment(healthAssessmentDTO);
 
         return ResponseEntity.status(200).body(new ApiResponse("Health Assessment Add Successful"));
     }
 
     // Update Health Assessment
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateHealthAssessment(@PathVariable Long id, @RequestBody @Valid HealthAssessmentRequestDTO healthAssessmentRequestDTO) {
+    public ResponseEntity<?> updateHealthAssessment(
+            @PathVariable Integer id,
+            @RequestBody @Valid HealthAssessmentDTO healthAssessmentDTO) {
 
-        healthAssessmentService.updateHealthAssessment(id, healthAssessmentRequestDTO);
+        healthAssessmentService.updateHealthAssessment(id, healthAssessmentDTO);
 
         return ResponseEntity.status(200).body(new ApiResponse("Health Assessment Update Successful"));
     }
 
     // Delete Health Assessment
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteHealthAssessment(@PathVariable Long id) {
+    public ResponseEntity<?> deleteHealthAssessment(@PathVariable Integer id) {
 
         healthAssessmentService.deleteHealthAssessment(id);
 

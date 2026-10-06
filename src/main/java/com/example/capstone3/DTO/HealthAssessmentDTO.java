@@ -1,4 +1,3 @@
-
 package com.example.capstone3.DTO;
 
 import jakarta.validation.constraints.NotNull;
@@ -12,13 +11,13 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HealthAssessmentRequestDTO {
+public class HealthAssessmentDTO {
 
     @NotNull(message = "User ID is required")
-    private Long userId;
+    private Integer userId;
 
     // Previous Assessment ID
-    private Long previousAssessmentId;
+    private Integer previousAssessmentId;
 
     // Attachments JSON
     private String attachments;

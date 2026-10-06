@@ -1,0 +1,12 @@
+package com.example.capstone3.Enum;
+
+public enum ChronicCondition {
+    HYPERTENSION,
+    DIABETES_T1,
+    DIABETES_T2,
+    HIGH_CHOLESTEROL,
+    FRUCTOSE_MALABSORPTION,
+    HEREDITARY_FRUCTOSE_INTOLERANCE,
+    CELIAC,
+    GLUTEN_SENSITIVITY
+}

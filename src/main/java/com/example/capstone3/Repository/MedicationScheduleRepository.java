@@ -1,4 +1,3 @@
-
 package com.example.capstone3.Repository;
 
 import com.example.capstone3.Model.MedicationSchedule;
@@ -9,11 +8,11 @@ import java.util.List;
 
 @Repository
 public interface MedicationScheduleRepository
-        extends JpaRepository<MedicationSchedule, Long> {
+        extends JpaRepository<MedicationSchedule, Integer> {
 
-    List<MedicationSchedule> findByUserId(Long userId);
+    // Get Medication Schedules By User ID
+    List<MedicationSchedule> findByUser_Id(Integer userId);
 
-    List<MedicationSchedule> findByUserIdAndIsActiveTrue(Long userId);
-
+    // Get Active Medication Schedules By User ID
+    List<MedicationSchedule> findByUser_IdAndIsActiveTrue(Integer userId);
 }
-

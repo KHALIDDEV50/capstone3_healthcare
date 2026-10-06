@@ -1,4 +1,3 @@
-
 package com.example.capstone3.DTO;
 
 import jakarta.validation.constraints.NotBlank;
@@ -13,10 +12,10 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MedicationScheduleRequestDTO {
+public class MedicationScheduleDTO {
 
     @NotNull(message = "User ID is required")
-    private Long userId;
+    private Integer userId;
 
     @NotBlank(message = "Medication name is required")
     @Size(max = 255, message = "Medication name must not exceed 255 characters")
